@@ -1,48 +1,51 @@
-import pyaudio
 from flask import Flask
+import time
 import json
+import threading
+import pyaudio
 
-# global overhead stuff
-FORMAT = pyaudio.paInt16
-CHANNELS = 2
-RATE = 44100
-CHUNK = 1024
-RECORD_SECONDS = 5
-WAVE_OUTPUT_FILENAME = "file.wav"
-audio = pyaudio.PyAudio()
+
 frames = []
-stream = audio.open(format=FORMAT,
-                    channels=CHANNELS,
-                    rate=RATE,
-                    input=True,
-                    frames_per_buffer=CHUNK)
 
 
-def grab_sound_block(data):
-    return frames 
+def thread_recorder():
+    global frames
+    frames = []
+    format = pyaudio.paInt16
+    channels = 1
+    rate = 44100  # samples per second
+    chunk = 1024  # samples per chunk
+    audio = pyaudio.PyAudio()
+    depth = int(rate / chunk * 20)
+    # start recording
+    stream = audio.open(format=format,
+                        channels=channels,
+                        rate=rate,
+                        input=True,
+                        frames_per_buffer=chunk)
+    while True:
+        try:
+            data = stream.read(chunk)
+            frames.append(data.hex())
+            if len(frames) > depth:
+                frames.pop(0)
+        except Exception as exc:
+            pass
 
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def default():
-    return grab_sound_block(frames)
-
-
-def record_loop(loop_on):
-    while True:
-        if loop_on.value == True:
-            data = stream.read(CHUNK)
-            frames.append(data)
-        #time.sleep(1)
+    obj = {'payload': frames,
+           'time': time.time()}
+    return json.dumps(obj)
 
 
 if __name__ == "__main__":
-   recording_on = Value('b', True)
-   p = Process(target=record_loop, args=(recording_on,))
-   p.start()  
-   app.run(debug=True,
-           use_reloader=False,
-           host='0.0.0.0',
-           port=5000)
-   p.join()
+    print('starting recorder')
+    thread = threading.Thread(target=thread_recorder)
+    thread.start()
+    print('starting flask')
+    app.run(port=5000, debug=True)
