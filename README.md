@@ -4,10 +4,13 @@ provides out-of-the-box functionality for robotics and ai in the form of a simpl
 
 ## requirements
 
-* json
-* 
-* sys
+* python3
 * flask
+* time
+* json
+* sys
+* threading
+* pyaudio
 
 ## usage
 
