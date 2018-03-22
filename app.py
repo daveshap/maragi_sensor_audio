@@ -3,7 +3,7 @@ import time
 import json
 import threading
 import pyaudio
-
+import sys
 
 frames = []
 
@@ -44,8 +44,10 @@ def default():
 
 
 if __name__ == "__main__":
-    print('starting recorder')
     thread = threading.Thread(target=thread_recorder)
     thread.start()
-    print('starting flask')
-    app.run(port=5000, debug=True)
+    if sys.argv[1] is int:
+        app.run(port = sys.argv[1])
+    else:
+        app.run(port=5000)
+        
