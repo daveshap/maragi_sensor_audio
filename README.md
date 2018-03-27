@@ -1,4 +1,4 @@
-# microphone microservice
+# Microphone Microservice
 
 provides out-of-the-box functionality for robotics and ai in the form of a simple and robust rest api
 
