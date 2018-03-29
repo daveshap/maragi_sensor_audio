@@ -10,7 +10,7 @@ Any computer microphone
 
 Serialized list of frames of audio samples compatible with PyAudio
 
-## requirements
+## Requirements
 
 * python3
 * flask
