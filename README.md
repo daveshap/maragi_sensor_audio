@@ -1,6 +1,14 @@
 # Microphone Microservice
 
-provides out-of-the-box functionality for robotics and ai in the form of a simple and robust rest api
+[https://github.com/benjaminharper2/maragi|MARAGI] microservice to provide audio clips for other services such as speech recognition and NLP
+
+## Input
+
+Any computer microphone
+
+## Output
+
+Serialized list of frames of audio samples compatible with PyAudio
 
 ## requirements
 
