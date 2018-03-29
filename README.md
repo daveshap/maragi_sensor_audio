@@ -1,6 +1,6 @@
 # Microphone Microservice
 
-[https://github.com/benjaminharper2/maragi| MARAGI] microservice to provide audio clips for other services such as speech recognition and NLP
+[MARAGI](https://github.com/benjaminharper2/maragi) microservice to provide audio clips for other services such as speech recognition and NLP
 
 ## Input
 
