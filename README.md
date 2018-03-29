@@ -12,11 +12,9 @@ provides out-of-the-box functionality for robotics and ai in the form of a simpl
 * threading
 * pyaudio
 
-## usage
+## API
 
-`python app.py <port (optional), default 5000>`
-
-Endpoint | Function | Description | Example
+Endpoint | Method | Request | Response
 --- | --- | --- | ---
 / | GET | Returns default dictionary | `{time: unix epoch, hex: 20 seconds of hex encoded samples }`
 
