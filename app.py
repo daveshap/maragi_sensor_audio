@@ -1,26 +1,28 @@
+import requests
 import math
 from collections import deque
 import audioop
-from flask import Flask, request
+import flask
 import time
 import json
 import threading
 import pyaudio
 
-#######################     flask stuff
+#           flask stuff
 
-subscribers = []
+subscribers = []    # list of urls to post sounds to
+port = 5000         # this needs to be a system argument
 
-#######################     audio stuff
+#           audio stuff
 
-frames = []  # container for audio samples
-channels = 1  # num audio channels
-rate = 44100  # samples per second
-chunk = 1024  # samples per chunk
-audio = pyaudio.PyAudio()  # audio device object
-depth = int(rate / chunk * 20)  # num seconds of audio to keep in memory
-silence = 2  # num seconds of silence to demarcate sounds i.e. all sounds within 2 seconds are part of same phrase
-threshold = 2500  # silence threshold
+frames = []                         # container for audio samples
+channels = 1                        # num audio channels
+rate = 44100                        # samples per second
+chunk = 1024                        # samples per chunk
+audio = pyaudio.PyAudio()           # audio device object
+depth = int(rate / chunk * 20)      # num seconds of audio to keep in memory
+silence = 2                         # num seconds of silence to demarcate sounds
+threshold = 2500                    # silence threshold
 
 
 def thread_recorder():
@@ -41,7 +43,12 @@ def thread_recorder():
 
 
 def post_sound(clip):
-    print('posting clip to ???')
+    for sub in subscribers:
+        try:
+            response = requests.request('POST', sub, data={'time': time.time(), 'hex': clip})
+            print('POST to', sub, response.status_code)
+        except Exception as exc:
+            print(exc)
 
 
 def thread_listener():
@@ -75,30 +82,35 @@ def thread_listener():
                     break
 
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 
 
 @app.route("/mic", methods=['GET', 'POST'])
 def default():
-    if request.method == 'GET':
+    if flask.request.method == 'GET':
+        # returns current 'frames', which is last 20 seconds of raw audio
         obj = {'payload': frames, 'time': time.time()}
         return json.dumps(obj)
-    elif request.method == 'POST':
-        post = request.form
-        if post['action'] == 'subscribe':
-            sub = (post['ip'], post['port'])
-            if sub in subscribers:
-                return 'already subscribed!'
-            else:
-                subscribers.append(sub)
-                return 'subscribed'
-        elif post['action'] == 'unsubscribe':
-            sub = (post['ip'], post['port'])
-            if sub in subscribers:
-                subscribers.remove(sub)
-                return 'unsubscribed'
-            else:
-                return 'not a subscriber'
+    elif flask.request.method == 'POST':
+        # expects object {action: (un)subscribe, url: http://blah:#/blah}
+        post = flask.request.form
+        try:
+            if post['action'] == 'subscribe':
+                sub = post['url']
+                if sub in subscribers:
+                    return 'already subscribed!'
+                else:
+                    subscribers.append(sub)
+                    return 'subscribed'
+            elif post['action'] == 'unsubscribe':
+                sub = post['url']
+                if sub in subscribers:
+                    subscribers.remove(sub)
+                    return 'unsubscribed'
+                else:
+                    return 'not a subscriber'
+        except Exception as exc:
+            return str(exc)
 
 
 if __name__ == "__main__":
@@ -106,4 +118,4 @@ if __name__ == "__main__":
     recorder.start()
     listener = threading.Thread(target=thread_listener)
     listener.start()
-    app.run(port=5000, debug=True)
+    app.run(port=port, debug=True)

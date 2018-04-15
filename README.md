@@ -26,6 +26,6 @@ Serialized list of frames of audio samples compatible with PyAudio
 
 Endpoint | Method | Request | Response
 --- | --- | --- | ---
-/mic | GET | returns 20 seconds of decoded audio | `{time: unix epoch, hex: 20 seconds of hex encoded samples }`
+/mic | GET | `''` | `{time: unix epoch, hex: 20 seconds of hex encoded samples }`
 /mic | POST | subscribe or unsubscribe `{action: (un)subscribe, url: http://blah:9999/api/endpoint}` | acknowledgement of subscription status, subscription messages same format as GET response
 
