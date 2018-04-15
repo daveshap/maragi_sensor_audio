@@ -92,6 +92,13 @@ def default():
             else:
                 subscribers.append(sub)
                 return 'subscribed'
+        elif post['action'] == 'unsubscribe':
+            sub = (post['ip'], post['port'])
+            if sub in subscribers:
+                subscribers.remove(sub)
+                return 'unsubscribed'
+            else:
+                return 'not a subscriber'
 
 
 if __name__ == "__main__":

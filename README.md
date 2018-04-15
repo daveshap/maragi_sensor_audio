@@ -1,10 +1,11 @@
 # Microphone Microservice
 
-[MARAGI](https://github.com/benjaminharper2/maragi) microservice to provide audio clips for other services such as speech recognition and NLP
+[MARAGI](https://github.com/benjaminharper2/maragi) microservice to provide audio clips for other services such as speech recognition and NLP.
+Allows services to subscribe. This service will POST detected sounds to given URL (IP or hostname, port, API endpoint).
 
 ## Input
 
-Any computer microphone
+Any computer microphone device
 
 ## Output
 
@@ -16,13 +17,15 @@ Serialized list of frames of audio samples compatible with PyAudio
 * flask
 * time
 * json
-* sys
 * threading
 * pyaudio
+* collections
+* audioop
 
 ## API
 
 Endpoint | Method | Request | Response
 --- | --- | --- | ---
-/ | GET | Returns default dictionary | `{time: unix epoch, hex: 20 seconds of hex encoded samples }`
+/mic | GET | returns 20 seconds of decoded audio | `{time: unix epoch, hex: 20 seconds of hex encoded samples }`
+/mic | POST | subscribe or unsubscribe `{action: (un)subscribe, url: http://blah:9999/api/endpoint}` | acknowledgement of subscription status, subscription messages same format as GET response
 
