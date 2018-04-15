@@ -1,11 +1,17 @@
 import math
 from collections import deque
 import audioop
-from flask import Flask
+from flask import Flask, request
 import time
 import json
 import threading
 import pyaudio
+
+#######################     flask stuff
+
+subscribers = []
+
+#######################     audio stuff
 
 frames = []  # container for audio samples
 channels = 1  # num audio channels
@@ -72,12 +78,20 @@ def thread_listener():
 app = Flask(__name__)
 
 
-@app.route("/")
+@app.route("/mic", methods=['GET', 'POST'])
 def default():
-    obj = {'payload': frames,
-           'time': time.time()}
-    print('')
-    return json.dumps(obj)
+    if request.method == 'GET':
+        obj = {'payload': frames, 'time': time.time()}
+        return json.dumps(obj)
+    elif request.method == 'POST':
+        post = request.form
+        if post['action'] == 'subscribe':
+            sub = (post['ip'], post['port'])
+            if sub in subscribers:
+                return 'already subscribed!'
+            else:
+                subscribers.append(sub)
+                return 'subscribed'
 
 
 if __name__ == "__main__":
