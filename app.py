@@ -26,6 +26,7 @@ threshold = 2500                    # silence threshold
 
 
 def thread_recorder():
+    print('recorder started')
     stream = audio.open(format=pyaudio.paInt16,
                         channels=channels,
                         rate=rate,
@@ -52,31 +53,33 @@ def post_sound(clip):
 
 
 def thread_listener():
+    rel = rate / chunk
+    print('listener started')
     stream = audio.open(format=pyaudio.paInt16,
                         channels=channels,
                         rate=rate,
                         input=True,
                         frames_per_buffer=chunk)
     while True:
-        # wait for sound to start
-        print('listening for sound...')
-        audio2send = []
-        rel = rate / chunk
-        slid_win = deque(maxlen=silence * rel)
-        prev_audio = deque(maxlen=silence * rel)  # Prepend audio from 0.5 seconds before noise was detected
+        # listening for sound
         started = False
         cur_data = stream.read(chunk)
-        slid_win.append(math.sqrt(abs(audioop.avg(cur_data, 4))))
-        if sum([x > threshold for x in slid_win]) > 0:
+        volume = cur_data.something.something
+        if volume > threshold:
             print('sound detected, recording...')
+            audio2send = []
+            silence_count = 0
+            frames_count = 0
             while True:
-                audio2send.append(cur_data)
-                started = False
-                slid_win = deque(maxlen=silence * rel)
-                prev_audio = deque(maxlen=0.5 * rel)
-                audio2send = []
-                tail_silence = 0
-                if tail_silence > silence:
+                frame = stream.read(chunk)
+                audio2send.append(frame.hex())
+                frames_count += 1
+                if is_silent(frame):
+                    tail_silence += 1
+                else:
+                    tail_silence = 0
+                
+                if tail_silence / rate > silence:
                     print('sound ended, sending now')
                     post_sound(audio2send)
                     break
@@ -87,14 +90,17 @@ app = flask.Flask(__name__)
 
 @app.route("/mic", methods=['GET', 'POST'])
 def default():
+    
     if flask.request.method == 'GET':
         # returns current 'frames', which is last 20 seconds of raw audio
         obj = {'payload': frames, 'time': time.time()}
         return json.dumps(obj)
+
     elif flask.request.method == 'POST':
         # expects object {action: (un)subscribe, url: http://blah:#/blah}
         post = flask.request.form
         try:
+            
             if post['action'] == 'subscribe':
                 sub = post['url']
                 if sub in subscribers:
@@ -102,6 +108,7 @@ def default():
                 else:
                     subscribers.append(sub)
                     return 'subscribed'
+            
             elif post['action'] == 'unsubscribe':
                 sub = post['url']
                 if sub in subscribers:
@@ -109,6 +116,7 @@ def default():
                     return 'unsubscribed'
                 else:
                     return 'not a subscriber'
+        
         except Exception as exc:
             return str(exc)
 
