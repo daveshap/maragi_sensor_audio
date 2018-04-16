@@ -1,6 +1,4 @@
 import requests
-import math
-from collections import deque
 import audioop
 import flask
 import time
@@ -53,33 +51,37 @@ def post_sound(clip):
 
 
 def thread_listener():
-    rel = rate / chunk
     print('listener started')
+    sound_clip = []
+    depth = int(rate / chunk * silence)
     stream = audio.open(format=pyaudio.paInt16,
                         channels=channels,
                         rate=rate,
                         input=True,
                         frames_per_buffer=chunk)
     while True:
-        # listening for sound
-        started = False
-        cur_data = stream.read(chunk)
-        volume = cur_data.something.something
-        if volume > threshold:
+        frame = stream.read(chunk)
+        sound_clip.append(frame.hex())
+        rms = audioop.rms(frame, 2)
+        print(rms)
+        if len(sound_clip) > depth:
+            sound_clip.pop(0)
+        if rms > threshold:
             print('sound detected, recording...')
-            audio2send = []
-            silence_count = 0
+            audio2send = list()
+            audio2send.append(sound_clip)
+            tail_silence = 0
             frames_count = 0
             while True:
                 frame = stream.read(chunk)
                 audio2send.append(frame.hex())
                 frames_count += 1
-                if is_silent(frame):
+                rms = audioop.rms(frame, 2)
+                if rms < threshold:
                     tail_silence += 1
                 else:
                     tail_silence = 0
-                
-                if tail_silence / rate > silence:
+                if tail_silence > (rate / chunk * silence):
                     print('sound ended, sending now')
                     post_sound(audio2send)
                     break
