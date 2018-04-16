@@ -63,7 +63,6 @@ def thread_listener():
         frame = stream.read(chunk)
         sound_clip.append(frame.hex())
         rms = audioop.rms(frame, 2)
-        print(rms)
         if len(sound_clip) > depth:
             sound_clip.pop(0)
         if rms > threshold:
@@ -71,11 +70,9 @@ def thread_listener():
             audio2send = list()
             audio2send.append(sound_clip)
             tail_silence = 0
-            frames_count = 0
             while True:
                 frame = stream.read(chunk)
                 audio2send.append(frame.hex())
-                frames_count += 1
                 rms = audioop.rms(frame, 2)
                 if rms < threshold:
                     tail_silence += 1
@@ -101,6 +98,7 @@ def default():
     elif flask.request.method == 'POST':
         # expects object {action: (un)subscribe, url: http://blah:#/blah}
         post = flask.request.form
+        print(post)
         try:
             
             if post['action'] == 'subscribe':
@@ -128,4 +126,4 @@ if __name__ == "__main__":
     recorder.start()
     listener = threading.Thread(target=thread_listener)
     listener.start()
-    app.run(port=port, debug=True)
+    app.run(port=port)
