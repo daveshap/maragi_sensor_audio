@@ -92,7 +92,7 @@ def default():
     
     if flask.request.method == 'GET':
         # returns current 'frames', which is last 20 seconds of raw audio
-        obj = {'payload': frames, 'time': time.time()}
+        obj = {'hex': frames, 'time': time.time()}
         return json.dumps(obj)
 
     elif flask.request.method == 'POST':
