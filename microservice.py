@@ -10,6 +10,7 @@ import pyaudio
 
 subscribers = []    # list of urls to post sounds to
 port = 5000         # this needs to be a system argument
+app = flask.Flask(__name__)
 
 #           audio stuff
 
@@ -82,9 +83,6 @@ def thread_listener():
                     print('sound ended, sending now')
                     post_sound(audio2send)
                     break
-
-
-app = flask.Flask(__name__)
 
 
 @app.route("/mic", methods=['GET', 'POST'])
