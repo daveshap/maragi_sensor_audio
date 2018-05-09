@@ -60,7 +60,7 @@ def thread_listener():
                         frames_per_buffer=chunk)
     while True:
         frame = stream.read(chunk)
-        sound_clip.append(frame.hex())
+        sound_clip.append(frame)
         rms = audioop.rms(frame, 2)
         if len(sound_clip) > depth:
             sound_clip.pop(0)
@@ -71,7 +71,7 @@ def thread_listener():
             tail_silence = 0
             while True:
                 frame = stream.read(chunk)
-                audio2send.append(frame.hex())
+                audio2send.append(frame)
                 rms = audioop.rms(frame, 2)
                 if rms < threshold:
                     tail_silence += 1
@@ -79,8 +79,7 @@ def thread_listener():
                     tail_silence = 0
                 if tail_silence > (rate / chunk * silence):
                     print('sound ended, sending now')
-                    print(type(audio2send), type(audio2send[0]))
-                    post_sound(audio2send)
+                    post_sound(audio2send)  # TODO send as binary raw audio file
                     break
 
 
@@ -91,7 +90,7 @@ def default():
         # returns current 'frames', which is last 20 seconds of raw audio
         # frames should be list of samples in the form of hex chunks
         obj = {'data': frames, 'time': time.time(), 'rate': rate}
-        return json.dumps(obj)
+        return json.dumps(obj)  # TODO send as binary raw audio file
 
     elif flask.request.method == 'POST':
         # expects object {action: (un)subscribe, url: http://blah:#/blah}
