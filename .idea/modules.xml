@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/mic_svc.iml" filepath="$PROJECT_DIR$/.idea/mic_svc.iml" />
+      <module fileurl="file://$USER_HOME$/speech_to_text_svc/.idea/speech_to_text_svc.iml" filepath="$USER_HOME$/speech_to_text_svc/.idea/speech_to_text_svc.iml" />
     </modules>
   </component>
 </project>

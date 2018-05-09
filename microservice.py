@@ -28,7 +28,7 @@ def send_to_subscribers(frames):
             response = requests.request(method='POST', url=sub, data=data, headers=headers)
             print('POST to', sub, response.text)
         except Exception as exc:
-            print(exc)
+            print('EXCEPTION', exc)
 
 
 def start_recording(stream, sound_clip):
@@ -66,11 +66,11 @@ def listener():
             start_recording(stream, sound_clip)
 
 
-@app.route(app_uri)
+@app.route(app_uri, methods=['POST'])
 def default():
     try:
         post = flask.request.form
-        print(post)
+        print('POST received', post)
         sub = post['url']
         if post['action'] == 'subscribe':
             if sub in subscribers:
@@ -81,7 +81,7 @@ def default():
             subscribers.remove(sub)
             return 'unsubscribed'
     except Exception as exc:
-        print(exc)
+        print('EXCEPTION', exc)
         return exc
 
 
