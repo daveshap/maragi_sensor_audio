@@ -6,20 +6,18 @@ import json
 import threading
 import pyaudio
 
-#           flask stuff
-
-subscribers = []    # list of urls to post sounds to
-port = 5000         # this needs to be a system argument
+#                                   flask stuff
+subscribers = []                    # list of urls to post sounds to
+port = 5000                         # this needs to be a system argument
 app = flask.Flask(__name__)
 
-#           audio stuff
-
+#                                   audio stuff
 frames = []                         # container for audio samples
 channels = 1                        # num audio channels
-rate = 44100                        # samples per second
+rate = 16000                        # samples per second
 chunk = 1024                        # samples per chunk
 audio = pyaudio.PyAudio()           # audio device object
-depth = int(rate / chunk * 20)      # num seconds of audio to keep in memory
+depth = int(rate / chunk * 20)      # num of chunks to keep in memory
 silence = 2                         # num seconds of silence to demarcate sounds
 threshold = 2500                    # silence threshold
 
@@ -45,7 +43,7 @@ def thread_recorder():
 def post_sound(clip):
     for sub in subscribers:
         try:
-            response = requests.request('POST', sub, data={'time': time.time(), 'hex': clip})
+            response = requests.request('POST', sub, data={'time': time.time(), 'data': clip, 'rate': rate})
             print('POST to', sub, response.status_code)
         except Exception as exc:
             print(exc)
@@ -81,6 +79,7 @@ def thread_listener():
                     tail_silence = 0
                 if tail_silence > (rate / chunk * silence):
                     print('sound ended, sending now')
+                    print(type(audio2send), type(audio2send[0]))
                     post_sound(audio2send)
                     break
 
@@ -90,7 +89,8 @@ def default():
     
     if flask.request.method == 'GET':
         # returns current 'frames', which is last 20 seconds of raw audio
-        obj = {'hex': frames, 'time': time.time()}
+        # frames should be list of samples in the form of hex chunks
+        obj = {'data': frames, 'time': time.time(), 'rate': rate}
         return json.dumps(obj)
 
     elif flask.request.method == 'POST':
