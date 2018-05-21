@@ -1,39 +1,44 @@
+import time
+import uuid
 import requests
 import audioop
-import flask
-import threading
 import pyaudio
+import json
 
-#                                   flask stuff
-subscribers = []                    # list of urls to post sounds to
-app_ip = '127.0.0.1'                # IP to use
-app_port = 5000                     # this needs to be a system argument  TODO optional argument
-app_uri = '/mic'                    # api endpoint  TODO optional argument
-app = flask.Flask(__name__)         # flask app
+
 headers = {'Content-Type': 'application/octet-stream'}
-
-#                                   audio stuff
+directory = 'http://127.0.0.1:5000/directory'
 channels = 1                        # num audio channels
 rate = 16000                        # samples per second
 chunk = 1024                        # samples per chunk
 audio = pyaudio.PyAudio()           # audio device object
 silence = 1                         # num seconds of silence to demarcate sounds
-threshold = 2500                    # silence threshold  TODO auto adapt to ambient noise
+threshold = 2500                    # silence threshold TODO auto adapt to ambient noise
 depth = int(rate / chunk * silence) # number of chunks to keep in memory
 
 
-def (frames):
+def publish_audio(frames, phonebook):
     data = b''.join(frames)
-    for sub in subscribers:
+    t = time.time()
+    u = uuid.uuid4()
+    payload = {'time': str(t),
+               'uuid': str(u),
+               'type': 'raw_audio',
+               'source': 'microphone service',
+               'data': str(data)}
+    for service in phonebook:
         try:
-            response = requests.request(method='POST', url=sub, data=data, headers=headers)
-            print('POST to', sub, response.text)
+            if service['input'] == 'raw_audio':
+                print('POST to', service)
+                response = requests.request(method='POST', url=service['svc_url'], json=payload, headers=headers)
+                print(response)
         except Exception as exc:
-            print('EXCEPTION', exc)
+            print(exc)
 
 
-def start_recording(stream, sound_clip):
+def record_sound(stream, sound_clip):
     tail_silence = 0
+    print('recording audio')
     while True:
         frame = stream.read(chunk)
         sound_clip.append(frame)
@@ -43,12 +48,18 @@ def start_recording(stream, sound_clip):
         else:
             tail_silence = 0
         if tail_silence > depth:
-            print('sound ended, sending now')
-            send_to_subscribers(sound_clip)
-            return
+            print('recording ended')
+            return sound_clip
 
 
-def listener():
+def get_phonebook():
+    response = requests.request(method='GET', url=directory)
+    text = response.text
+    phonebook = json.loads(text)
+    return phonebook
+
+
+if __name__ == "__main__":
     print('listener started')
     sound_clip = []
     stream = audio.open(format=pyaudio.paInt16,
@@ -62,31 +73,10 @@ def listener():
         rms = audioop.rms(frame, 2)
         if len(sound_clip) > depth:
             sound_clip.pop(0)
+        elif len(sound_clip) < depth:
+            continue
         if rms > threshold:
-            print('sound detected, recording...')
-            start_recording(stream, sound_clip)
-
-
-@app.route(app_uri, methods=['POST'])
-def default():
-    try:
-        post = flask.request.form
-        print('POST received', post)
-        sub = post['url']
-        if post['action'] == 'subscribe':
-            if sub in subscribers:
-                return 'subscribed'
-            subscribers.append(sub)
-            return 'subscribed'
-        elif post['action'] == 'unsubscribe':
-            subscribers.remove(sub)
-            return 'unsubscribed'
-    except Exception as exc:
-        print('EXCEPTION', exc)
-        return exc
-
-
-if __name__ == "__main__":
-    thread = threading.Thread(target=listener)
-    thread.start()
-    app.run(port=app_port)
+            audio_clip = record_sound(stream, sound_clip)
+            phonebook = get_phonebook()
+            publish_audio(audio_clip, phonebook)
+            sound_clip = []

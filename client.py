@@ -1,32 +1,33 @@
 import flask
+import json
 import requests
 
 
-app_uri = '/client'
-app_port = 5001
-app_url = 'http://127.0.0.1:%s%s' % (app_port, app_uri)
-mic_url = 'http://127.0.0.1:5000/mic'
-app = flask.Flask(__name__)
+directory_url = 'http://127.0.0.1:5000/directory'
+app = flask.Flask(__name__)                                     # flask app
+app_port = 9999                                                 # port for this service to run on
+app_uri = "/test"                                               # uri endpoint
+app_ip = "127.0.0.1"                                            # ip address of local machine
+app_url = "http://%s:%s%s" % (app_ip, app_port, app_uri)        # receiving url
 
 
-@app.route(app_uri)
+@app.route(app_uri, methods=["POST", "GET"])
 def default():
-    try:
-        print(flask.request.form)
-        return 'got it thanks!'
-    except Exception as exc:
-        print(exc)
-        return exc
+    payload = json.loads(flask.request.data)
+    print(payload)
+    return json.dumps({'result': 'got it!'})
 
 
-def subscribe():
-    try:
-        response = requests.request('POST', mic_url, data={'action': 'subscribe', 'url': app_url})
-        print(response.text)
-    except Exception as exc:
-        print(exc)
-
-
-if __name__ == "__main__":
-    subscribe()
+if __name__ == '__main__':
+    service = {'name': 'test audio service',
+               'input': 'raw_audio',
+               'output': 'audio_tests',
+               'svc_ip': app_ip,
+               'svc_port': app_port,
+               'svc_uri': app_uri,
+               'svc_url': app_url}
+    payload = {'service': service}
+    print('REGISTER', payload)
+    response = requests.request(method='POST', url=directory_url, json=payload)
+    print('RESPONSE', response)
     app.run(port=app_port)
