@@ -6,6 +6,7 @@ import pyaudio
 
 #                                   flask stuff
 subscribers = []                    # list of urls to post sounds to
+app_ip = '127.0.0.1'                # IP to use
 app_port = 5000                     # this needs to be a system argument  TODO optional argument
 app_uri = '/mic'                    # api endpoint  TODO optional argument
 app = flask.Flask(__name__)         # flask app
@@ -21,7 +22,7 @@ threshold = 2500                    # silence threshold  TODO auto adapt to ambi
 depth = int(rate / chunk * silence) # number of chunks to keep in memory
 
 
-def send_to_subscribers(frames):
+def (frames):
     data = b''.join(frames)
     for sub in subscribers:
         try:
