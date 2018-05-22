@@ -8,7 +8,7 @@ Any computer microphone device compatible with PyAudio
 
 ## Output
 
-Publishes raw audio to any service that registers "raw_audio" as an input
+Publishes raw audio to any service that registers "raw_audio" as an input. Uses HTTP PUT.
 
 Field | Description
 --- | ---

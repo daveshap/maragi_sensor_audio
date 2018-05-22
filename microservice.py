@@ -30,7 +30,7 @@ def publish_audio(frames, phonebook):
         try:
             if service['input'] == 'raw_audio':
                 print('POST to', service)
-                response = requests.request(method='POST', url=service['svc_url'], json=payload, headers=headers)
+                response = requests.request(method='PUT', url=service['svc_url'], json=payload)
                 print(response)
         except Exception as exc:
             print(exc)
