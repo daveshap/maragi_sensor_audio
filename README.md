@@ -4,7 +4,7 @@ General purpose microphone service that publishes audio above a certain threshol
 
 ## Input
 
-Any computer microphone device
+Any computer microphone device compatible with PyAudio
 
 ## Output
 
@@ -21,3 +21,7 @@ data | binary sample data as string
 ## Requirements
 
 * directory service
+* pyaudio
+* audioop
+* flask
+* microphone input device
