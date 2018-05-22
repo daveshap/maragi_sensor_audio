@@ -8,7 +8,15 @@ Any computer microphone device
 
 ## Output
 
-Serialized list of frames of audio samples compatible with PyAudio
+Publishes raw audio to any service that registers "raw_audio" as an input
+
+Field | Description
+--- | ---
+time | unix epoch
+uuid | uuid v4 identifier for sample
+type | 'raw_audio'
+source | 'microphone service'
+data | binary sample data as string
 
 ## Requirements
 
