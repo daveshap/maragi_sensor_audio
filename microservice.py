@@ -11,26 +11,24 @@ phonebook = []
 channels = 1                        # num audio channels
 rate = 16000                        # 16khz sample rate
 chunk = 4000                        # 250ms per audio chunk
-audio = pyaudio.PyAudio()           # audio device object
 
 
 def publish_audio(data):
-    global phonebook
-    t = time.time()
-    u = uuid.uuid4()
-    payload = {'time': str(t),
-               'uuid': str(u),
-               'type': 'raw_audio',
-               'source': 'microphone service',
-               'data': data}
+    payload = {'time': str(time.time()),
+               'uuid': str(uuid.uuid4()),
+               'sensor': 'audio',
+               'metadata': {'chunk': chunk,
+                            'rate': rate,
+                            'channels': channels,
+                            'format': 'pyaudio.paInt16',
+                            'encoding': 'hex'},
+               'data': data.hex()}
     for service in phonebook:
         try:
-            if service['input'] == 'raw_audio':
-                #print('POST to', service)
-                response = requests.request(method='PUT', url=service['svc_url'], json=payload)
-                #print(response)
+            if service['input'] == 'audio':
+                requests.request(method='PUT', url=service['svc_url'], json=payload)
         except Exception as exc:
-            print(exc)
+            print(service, exc)
 
 
 def get_phonebook():
@@ -47,13 +45,12 @@ def get_phonebook():
 if __name__ == "__main__":
     phonebook_updater = threading.Thread(target=get_phonebook)
     phonebook_updater.start()
-    stream = audio.open(format=pyaudio.paInt16,
-                        channels=channels,
-                        rate=rate,
-                        input=True,
-                        frames_per_buffer=chunk)
-    print('audio stream running')
+    stream = pyaudio.PyAudio().open(format=pyaudio.paInt16,
+                                    channels=channels,
+                                    rate=rate,
+                                    input=True)
+    print('audio stream is open')
     while True:
         frame = stream.read(chunk)
-        publisher = threading.Thread(target=publish_audio(frame.hex()))
+        publisher = threading.Thread(target=publish_audio(frame))
         publisher.start()

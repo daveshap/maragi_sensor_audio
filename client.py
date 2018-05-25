@@ -20,7 +20,7 @@ def default():
 
 if __name__ == '__main__':
     service = {'name': 'test audio service',
-               'input': 'raw_audio',
+               'input': 'audio',
                'output': 'audio_tests',
                'svc_ip': app_ip,
                'svc_port': app_port,
