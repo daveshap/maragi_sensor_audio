@@ -17,15 +17,14 @@ def publish_audio(data):
     payload = {'time': str(time.time()),
                'uuid': str(uuid.uuid4()),
                'sensor': 'audio',
-               'metadata': {'chunk': chunk,
-                            'rate': rate,
-                            'channels': channels,
-                            'format': 'pyaudio.paInt16',
-                            'encoding': 'hex'},
+               'sample_rate': rate,
+               'channels': channels,
+               'sample_width': 16,
+               'side': 'mono',
                'data': data.hex()}
     for service in phonebook:
         try:
-            if service['input'] == 'audio':
+            if service['input'] == 'raw_audio':
                 requests.request(method='PUT', url=service['svc_url'], json=payload)
         except Exception as exc:
             print(service, exc)
