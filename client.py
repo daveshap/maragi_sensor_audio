@@ -13,21 +13,14 @@ app_url = 'http://%s:%s%s' % (app_ip, app_port, app_uri)        # receiving url
 
 @app.route(app_uri, methods=['PUT', 'GET'])
 def default():
-    payload = json.loads(flask.request.data)
-    print(payload)
+    print(json.loads(flask.request.data))
     return json.dumps({'result': 'got it!'})
 
 
 if __name__ == '__main__':
-    service = {'name': 'test audio service',
-               'input': 'audio',
-               'output': 'audio_tests',
-               'svc_ip': app_ip,
-               'svc_port': app_port,
-               'svc_uri': app_uri,
+    service = {'input': 'raw_audio',
                'svc_url': app_url}
-    payload = {'service': service}
-    print('REGISTER', payload)
-    response = requests.request(method='PUT', url=directory_url, json=payload)
+    print('REGISTER', service)
+    response = requests.request(method='PUT', url=directory_url, json=service)
     print('RESPONSE', response)
     app.run(port=app_port)

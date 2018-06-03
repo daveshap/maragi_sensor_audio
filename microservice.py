@@ -25,9 +25,10 @@ def publish_audio(data):
     for service in phonebook:
         try:
             if service['input'] == 'raw_audio':
-                requests.request(method='PUT', url=service['svc_url'], json=payload)
+                resp = requests.request(method='PUT', url=service['svc_url'], json=payload)
+                print(resp.text)
         except Exception as exc:
-            print(service, exc)
+            print('EXCEPTION', exc)
 
 
 def get_phonebook():
