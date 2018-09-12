@@ -9,9 +9,7 @@ def publish_audio():
     print('audio stream is open')
     while True:
         frame = stream.read(4000)
-        channel.basic_publish(exchange='sensor_audio',
-                              body=frame.hex(),
-                              routing_key='')
+        channel.basic_publish(exchange='sensor_audio', body=frame.hex(), routing_key='')
 
 
 if __name__ == "__main__":
