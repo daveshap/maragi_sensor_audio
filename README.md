@@ -1,27 +1,15 @@
 # Microphone Microservice
 
-General purpose microphone service that publishes audio above a certain threshold
+Generic microphone publisher for MARAGI. Includes Dockerfile for composing Docker image. 
 
 ## Input
 
-Any computer microphone device compatible with PyAudio
+Any computer microphone device compatible with PyAudio.
+
+## Docker
+
+Make sure to instantiate your Docker container with `docker run --device /dev/snd:/dev/snd <container_name>`
 
 ## Output
 
-Publishes raw audio to any service that registers "raw_audio" as an input. Uses HTTP PUT.
-
-Field | Description
---- | ---
-time | unix epoch
-uuid | uuid v4 identifier for sample
-type | 'raw_audio'
-source | 'microphone service'
-data | binary sample data as string
-
-## Requirements
-
-* directory service
-* pyaudio
-* audioop
-* flask
-* microphone input device
+Emits raw hexadecimal audio sample of size 4000 samples at rate of 16kHz. Thus each sample is 250ms. This is pretty standard for audio streaming in real-time for speech recognition and other sound detection.
