@@ -3,7 +3,7 @@ import pika
 
 
 def publish_audio():
-    parameters = pika.URLParameters('amqp://maragi:maragi@maragi-rabbit:5672/%2F')
+    parameters = pika.URLParameters('amqp://maragi:maragi@0.0.0.0:5672/%2F')
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
     stream = pyaudio.PyAudio().open(format=pyaudio.paInt16, channels=1, rate=16000, input=True)
