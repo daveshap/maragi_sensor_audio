@@ -3,7 +3,7 @@ import pika
 
 
 def publish_audio():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.0.13'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='0.0.0.0'))
     channel = connection.channel()
     stream = pyaudio.PyAudio().open(format=pyaudio.paInt16, channels=1, rate=16000, input=True)
     print('audio stream is open')
