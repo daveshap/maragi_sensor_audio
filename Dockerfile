@@ -1,8 +1,7 @@
-FROM python:3
+FROM python:3.6
 
 ADD amqp_producer.py /
 
-RUN apt-get install gcc
 RUN pip install pika
 RUN pip install pyaudio
 
