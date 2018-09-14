@@ -6,7 +6,8 @@ def callback(ch, method, properties, body):
 
 
 if __name__ == '__main__':
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    parameters = pika.URLParameters('amqp://guest:guest@maragi-rabbit:5672/%2F')
+    connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
     channel.exchange_declare(exchange='sensor_audio', exchange_type='fanout')
     result = channel.queue_declare(exclusive=True)
