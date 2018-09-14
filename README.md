@@ -8,8 +8,7 @@ Any computer microphone device compatible with PyAudio.
 
 ## Docker
 
-Instantiate the RabbitMQ container for the first time:
-* `docker run -d --hostname maragi-rabbit --name maragi_rabbit -p 8080:15672 rabbitmq:3-management`
+This is meant to run with [maragi_rabbit](https://hub.docker.com/r/daveshap/maragi_rabbit/)
 
 ## Output
 
