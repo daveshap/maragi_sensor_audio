@@ -2,7 +2,7 @@ import pyaudio
 import pika
 
 
-def get_usb_mic_idx(audio)
+def get_usb_mic_idx(audio):
     for i in range(audio.get_device_count()):
         info = audio.get_device_info_by_index(i)
         if 'USB' in info['name'] and 'Audio' in info['name']:
