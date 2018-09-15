@@ -33,7 +33,7 @@ if __name__ == "__main__":
             audio = pyaudio.PyAudio()
             usb = get_usb_mic_idx(audio)
             print('opening audio stream')
-            stream = audio.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, input_device_index=idx)
+            stream = audio.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, input_device_index=usb)
             amqp = open_amqp_conn()
             publish_audio_loop(stream, amqp)
         except Exception as oops:
