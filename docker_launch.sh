@@ -1,1 +1,1 @@
-docker run --privileged daveshap/maragi_mic:latest
+docker run -d --privileged --network maragi_net daveshap/maragi_mic:latest
