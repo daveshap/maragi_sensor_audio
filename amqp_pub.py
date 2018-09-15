@@ -8,6 +8,7 @@ def get_usb_mic_idx():
         info = audio.get_device_info_by_index(i)
         if 'USB' in info['name'] and 'Audio' in info['name']:
             print('FOUND audio device', info)
+            audio.terminate()
             return i
     exit('No USB audio devices detected. Please run container with --privileged')
 
