@@ -21,7 +21,7 @@ def publish_audio_loop(stream, channel):
 def open_amqp_conn():        
     print('opening AMQP connection')
     credentials = pika.PlainCredentials('guest', 'guest')
-    parameters = pika.ConnectionParameters('127.0.0.1', 5672, '/', credentials)
+    parameters = pika.ConnectionParameters('MaragiRabbit', 5672, '/', credentials)
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
     return channel
