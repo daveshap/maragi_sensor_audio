@@ -15,7 +15,7 @@ def publish_audio(idx):
     print('opening audio stream')
     stream = pyaudio.PyAudio().open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, input_device_index=idx)
     print('opening AMQP connection')
-    parameters = pika.URLParameters('amqp://guest:guest@maragi-rabbit:5672/%2F')
+    parameters = pika.URLParameters('amqp://guest:guest@MaragiRabbit:5672/%2F')
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
     print('starting publish loop')
